@@ -6,6 +6,8 @@ MAINTAINER juan.arias@schibsted.com
 ADD requirements.txt .
 RUN pip3 install -r requirements.txt
 
+RUN mkdir /site
+WORKDIR /site
 ADD app.py .
 
 EXPOSE 5000
