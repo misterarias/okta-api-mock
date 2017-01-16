@@ -34,15 +34,6 @@ users = {
         },
     }
 
-
-def validate_user(username, password):
-    print("u: {}, p: {}".format(username, password))
-    if username in users and users[username]['password'] == password:
-        return users[username]
-    else:
-        print("... does not exist")
-        return False
-
 group_names = ['Everyone', 'StoreManager', 'Test1', 'Test2']
 
 errors = {
@@ -72,6 +63,15 @@ errors = {
         'long': "Recovery credential not set."
         }
     }
+
+
+def validate_user(username, password):
+    print("u: {}, p: {}".format(username, password))
+    if username in users and users[username]['password'] == password:
+        return users[username]
+    else:
+        print("... does not exist")
+        return False
 
 
 def make_okta_error(errorCode, extra=False):
@@ -331,8 +331,7 @@ def authn_MFA_UNENROLLED():
                         "hints": {"allow": ["POST"]}
                     }
                 }
-            },
-            {
+            }, {
                 "factorType": "token:software:totp",
                 "provider": "GOOGLE",
                 "_links": {
@@ -341,8 +340,7 @@ def authn_MFA_UNENROLLED():
                         "hints": {"allow": ["POST"]}
                     }
                 }
-            },
-            {
+            }, {
                 "factorType": "token:software:totp",
                 "provider": "OKTA",
                 "_links": {
@@ -780,7 +778,6 @@ def authn_recovery_answer():
 def authn_credentials_reset_password():
     data = request.get_json()
     state_token = data['stateToken']
-    new_password = data['newPassword']
 
     # FIXME: Make sure this is the correct error
     rv = make_okta_error("E0000011")
@@ -791,6 +788,7 @@ def authn_credentials_reset_password():
     if state_token != 'MockedRecoveryToken':
         pass
     # FIXME: Add this feature
+    # new_password = data['newPassword']
     # if !valid(new_password):
     #     rv = make_okta_error("")
     #     status = 401
@@ -1010,9 +1008,9 @@ def groups():
                     status=status,
                     mimetype='application/json')
 
+
 if __name__ == "__main__":
     # Bind to PORT if defined, otherwise default to 5000.
-    port = int(os.environ.get('PORT', 5000))
-    if port == 5000:
-        app.debug = True
-    app.run(port=port)
+    port = int(os.environ.get('FLASK_PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', False)
+    app.run(debug=debug, port=port)
